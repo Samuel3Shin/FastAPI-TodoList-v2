@@ -11,9 +11,8 @@ Base = declarative_base()
 
 # Dependency to get a database session
 def get_db():
-    db = None
-    try:
-        db = SessionLocal()
+    db = SessionLocal()
+    try: 
         yield db
     finally:
         db.close()

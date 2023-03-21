@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import datetime
 from typing import Optional
 from pydantic import BaseModel
 
@@ -6,7 +6,7 @@ class TaskBase(BaseModel):
     title: str
     description: Optional[str] = None
     priority: Optional[int] = None
-    due_date: date
+    due_date: datetime
 
 class TaskCreate(TaskBase):
     pass

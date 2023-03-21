@@ -16,12 +16,12 @@ def create_user(db: Session, user: schemas.UserCreate):
 def get_task(db: Session, task_id: int):
     return db.query(models.Task).filter(models.Task.id == task_id).first()
 
-def get_tasks(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(models.Task).offset(skip).limit(limit).all()
+def get_tasks(db: Session, current_user_id):
+    db_tasks = db.query(models.Task).filter(models.Task.owner_id == current_user_id).all()
+    return db_tasks
 
 def create_task(db: Session, task: schemas.TaskCreate, owner_id: int):
-    due_date = datetime.strptime(task.due_date, '%Y-%m-%d %H:%M:%S')
-    db_task = models.Task(**task.dict(), due_date=due_date, owner_id=owner_id)
+    db_task = models.Task(title=task.title, description=task.description, priority=task.priority, due_date=task.due_date, owner_id=owner_id)
     db.add(db_task)
     db.commit()
     db.refresh(db_task)
