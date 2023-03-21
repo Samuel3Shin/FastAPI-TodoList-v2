@@ -16,8 +16,8 @@ def create_user(db: Session, user: schemas.UserCreate):
 def get_task(db: Session, task_id: int):
     return db.query(models.Task).filter(models.Task.id == task_id).first()
 
-def get_tasks(db: Session, current_user_id):
-    db_tasks = db.query(models.Task).filter(models.Task.owner_id == current_user_id).all()
+def get_tasks(db: Session, current_user_id, skip: int = 0, limit: int = 10):
+    db_tasks = db.query(models.Task).filter(models.Task.owner_id == current_user_id).offset(skip).limit(limit).all()
     return db_tasks
 
 def create_task(db: Session, task: schemas.TaskCreate, owner_id: int):

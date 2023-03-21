@@ -25,9 +25,9 @@ def login_for_access_token(form_data: auth.OAuth2PasswordRequestForm = Depends()
     return {"access_token": access_token, "token_type": "bearer"}
 
 @router.get("/tasks", response_model=List[schemas.Task])
-def read_tasks(token, db: Session = Depends(get_db)):
+def read_tasks(token, skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
     current_user = auth.get_current_user(token, db)
-    tasks = crud.get_tasks(db, current_user.id)
+    tasks = crud.get_tasks(db, current_user.id, skip=skip, limit=limit)
     return tasks
 
 @router.post("/tasks", response_model=schemas.Task)
