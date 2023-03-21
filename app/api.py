@@ -36,7 +36,8 @@ def create_task(token, task: schemas.TaskCreate, db: Session = Depends(get_db)):
     return crud.create_task(db=db, task=task, owner_id=current_user.id)
 
 @router.put("/tasks/{task_id}", response_model=schemas.Task)
-def update_task(task_id: int, task: schemas.TaskUpdate, db: Session = Depends(get_db), current_user: schemas.User = Depends(auth.get_current_user)):
+def update_task(token, task_id: int, task: schemas.TaskUpdate, db: Session = Depends(get_db)):
+    current_user = auth.get_current_user(token, db)    
     db_task = crud.get_task(db=db, task_id=task_id)
     if not db_task:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Task not found")
@@ -45,7 +46,8 @@ def update_task(task_id: int, task: schemas.TaskUpdate, db: Session = Depends(ge
     return crud.update_task(db=db, task_id=task_id, task=task)
 
 @router.delete("/tasks/{task_id}", response_model=schemas.Task)
-def delete_task(task_id: int, db: Session = Depends(get_db), current_user: schemas.User = Depends(auth.get_current_user)):
+def delete_task(token, task_id: int, db: Session = Depends(get_db)):
+    current_user = auth.get_current_user(token, db)   
     db_task = crud.get_task(db=db, task_id=task_id)
     if not db_task:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Task not found")
