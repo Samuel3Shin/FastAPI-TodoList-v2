@@ -4,7 +4,6 @@ ecdsa==0.18.0
 fastapi==0.95.0
 h11==0.14.0
 idna==3.4
-jose==1.0.0
 passlib==1.7.4
 psycopg2-binary
 pyasn1==0.4.8
