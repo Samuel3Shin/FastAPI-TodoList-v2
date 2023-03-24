@@ -1,5 +1,5 @@
 from typing import List
-from fastapi import APIRouter, Depends, File, Response, UploadFile, HTTPException, File, UploadFile
+from fastapi import APIRouter, Depends, File, Form, Response, UploadFile, HTTPException, File, UploadFile
 from sqlalchemy.orm import Session
 from app import crud, auth, schemas
 from app.auth import get_current_user
@@ -32,6 +32,7 @@ async def upload_text_file(
 @router.post("/upload_audio")
 async def upload_audio_file(
     file: UploadFile = File(...),
+    agent_channel: str = Form(...),
     db: Session = Depends(get_db),
     token: str = Depends(oauth2_scheme),
 ):
@@ -41,9 +42,9 @@ async def upload_audio_file(
     filename = file.filename
     content = await file.read()
 
-    # Save the content to the database
-    crud.save_audio_file(db, content=content,
-                         filename=filename, owner_id=current_user.id)
+    # Save the content and agent_channel to the database
+    crud.save_audio_file(db, content=content, filename=filename,
+                         agent_channel=agent_channel, owner_id=current_user.id)
 
     return {"filename": file.filename}
 

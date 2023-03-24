@@ -33,8 +33,9 @@ class AudioFile(Base):
     __tablename__ = "audio_files"
 
     id = Column(Integer, primary_key=True, index=True)
-    filename = Column(String, index=True)
     content = Column(LargeBinary)
+    filename = Column(String, index=True)
+    agent_channel = Column(String)
     owner_id = Column(Integer, ForeignKey("users.id"))
 
     owner = relationship("User", back_populates="audio_files")

@@ -56,6 +56,7 @@ class AudioFileCreate(AudioFileBase):
 class AudioFile(AudioFileBase):
     id: int
     owner_id: int
+    agent_channel: str
 
     class Config:
         orm_mode = True

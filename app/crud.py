@@ -61,13 +61,13 @@ def save_text_file_content(db: Session, content: str, owner_id: int):
     pass
 
 
-def save_audio_file(db: Session, content: bytes, filename: str, owner_id: int):
-    db_audio_file = models.AudioFile(
-        content=content, filename=filename, owner_id=owner_id)
-    db.add(db_audio_file)
+def save_audio_file(db: Session, content: bytes, filename: str, agent_channel: str, owner_id: int):
+    audio_file = models.AudioFile(
+        content=content, filename=filename, agent_channel=agent_channel, owner_id=owner_id)
+    db.add(audio_file)
     db.commit()
-    db.refresh(db_audio_file)
-    return db_audio_file
+    db.refresh(audio_file)
+    return audio_file
 
 
 def get_audio_file_by_id(db: Session, audio_id: int):
