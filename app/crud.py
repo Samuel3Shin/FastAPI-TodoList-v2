@@ -68,3 +68,11 @@ def save_audio_file(db: Session, content: bytes, filename: str, owner_id: int):
     db.commit()
     db.refresh(db_audio_file)
     return db_audio_file
+
+
+def get_audio_file_by_id(db: Session, audio_id: int):
+    return db.query(models.AudioFile).filter(models.AudioFile.id == audio_id).first()
+
+
+def get_audio_files_by_owner(db: Session, owner_id: int):
+    return db.query(models.AudioFile).filter(models.AudioFile.owner_id == owner_id).all()
