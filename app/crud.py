@@ -44,8 +44,15 @@ def delete_task(db: Session, task_id: int):
     db.commit()
     return db_task
 
-def save_text_file_content(db: Session, content: str, owner_id):
+def save_text_file_content(db: Session, content: str, owner_id: int):
     text_file = models.TextFile(content=content, owner_id=owner_id)
     db.add(text_file)
     db.commit()
     pass
+
+def save_audio_file(db: Session, content: bytes, filename: str, owner_id: int):
+    db_audio_file = models.AudioFile(content=content, filename=filename, owner_id=owner_id)
+    db.add(db_audio_file)
+    db.commit()
+    db.refresh(db_audio_file)
+    return db_audio_file
