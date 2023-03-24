@@ -4,22 +4,23 @@ from datetime import datetime, timedelta
 from typing import List
 from app import schemas, crud, auth
 from app.database import get_db
+from app.auth import oauth2_scheme
 
 router = APIRouter()
 
 @router.get("/tasks", response_model=List[schemas.Task])
-def read_tasks(token, skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
+def read_tasks(skip: int = 0, limit: int = 10, token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     current_user = auth.get_current_user(token, db)
     tasks = crud.get_tasks(db, current_user.id, skip=skip, limit=limit)
     return tasks
 
 @router.post("/tasks", response_model=schemas.Task)
-def create_task(token, task: schemas.TaskCreate, db: Session = Depends(get_db)):
+def create_task(task: schemas.TaskCreate, token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     current_user = auth.get_current_user(token, db)    
     return crud.create_task(db=db, task=task, owner_id=current_user.id)
 
 @router.put("/tasks/{task_id}", response_model=schemas.Task)
-def update_task(token, task_id: int, task: schemas.TaskUpdate, db: Session = Depends(get_db)):
+def update_task(task_id: int, task: schemas.TaskUpdate, token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     current_user = auth.get_current_user(token, db)    
     db_task = crud.get_task(db=db, task_id=task_id)
     if not db_task:
@@ -29,7 +30,7 @@ def update_task(token, task_id: int, task: schemas.TaskUpdate, db: Session = Dep
     return crud.update_task(db=db, task_id=task_id, task=task)
 
 @router.delete("/tasks/{task_id}", response_model=schemas.Task)
-def delete_task(token, task_id: int, db: Session = Depends(get_db)):
+def delete_task(task_id: int, token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     current_user = auth.get_current_user(token, db)   
     db_task = crud.get_task(db=db, task_id=task_id)
     if not db_task:
