@@ -17,3 +17,9 @@ class Task(Base):
     priority = Column(Integer)
     due_date = Column(DateTime)
     owner_id = Column(Integer, index=True)
+
+class TextFile(Base):
+    __tablename__ = "textfiles"
+    id = Column(Integer, primary_key=True, index=True)
+    content = Column(String)
+    owner_id = Column(Integer, index=True)

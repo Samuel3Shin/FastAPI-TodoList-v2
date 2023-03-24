@@ -43,3 +43,9 @@ def delete_task(db: Session, task_id: int):
     db.delete(db_task)
     db.commit()
     return db_task
+
+def save_text_file_content(db: Session, content: str, owner_id):
+    text_file = models.TextFile(content=content, owner_id=owner_id)
+    db.add(text_file)
+    db.commit()
+    pass

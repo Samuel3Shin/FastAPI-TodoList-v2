@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app import models
 from app.database import engine
-from app.routers import users, tasks
+from app.routers import users, tasks, files
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -19,3 +19,4 @@ app.add_middleware(
 
 app.include_router(users.router, prefix="/users", tags=["users"])
 app.include_router(tasks.router, prefix="/tasks", tags=["tasks"])
+app.include_router(files.router, prefix="/files", tags=["files"])
