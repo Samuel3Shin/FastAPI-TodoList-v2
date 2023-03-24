@@ -27,10 +27,21 @@ class Task(TaskBase):
 
 class UserBase(BaseModel):
     username: str
+    password: str
+    company_name: str
+    credits: int
+    is_admin: bool
+
+    class Config:
+        orm_mode = True
 
 
 class UserCreate(UserBase):
-    password: str
+    pass
+
+
+class UserUpdate(UserBase):
+    pass
 
 
 class User(UserBase):

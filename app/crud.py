@@ -8,10 +8,39 @@ def get_user(db: Session, username: str):
 
 
 def create_user(db: Session, user: schemas.UserCreate):
-    db_user = models.User(username=user.username, password=user.password)
+    db_user = models.User(username=user.username, password=user.password,
+                          company_name=user.company_name, credits=user.credits, is_admin=user.is_admin)
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
+    return db_user
+
+
+def get_users(db: Session, skip: int = 0, limit: int = 100):
+    return db.query(models.User).offset(skip).limit(limit).all()
+
+
+def update_user(db: Session, user_id: int, user: schemas.UserUpdate):
+    db_user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not db_user:
+        return None
+
+    for key, value in user.dict().items():
+        if value is not None:
+            setattr(db_user, key, value)
+
+    db.commit()
+    db.refresh(db_user)
+    return db_user
+
+
+def delete_user(db: Session, user_id: int):
+    db_user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not db_user:
+        return None
+
+    db.delete(db_user)
+    db.commit()
     return db_user
 
 

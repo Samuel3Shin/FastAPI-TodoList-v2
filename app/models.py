@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, LargeBinary, ForeignKey
+from sqlalchemy import Boolean, Column, Integer, String, DateTime, LargeBinary, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
@@ -10,6 +10,10 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String, unique=True, index=True)
     password = Column(String)
+    company_name = Column(String)
+    credits = Column(Integer)
+    is_active = Column(Boolean, default=True)
+    is_admin = Column(Boolean, default=False)
 
 
 class Task(Base):
