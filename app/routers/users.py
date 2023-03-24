@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
 from app import schemas, crud, auth
 from app.database import get_db
+from app.auth import oauth2_scheme
 
 router = APIRouter()
 
@@ -31,7 +32,11 @@ def login_for_access_token(form_data: auth.OAuth2PasswordRequestForm = Depends()
 
 
 @router.post("/users/", response_model=schemas.User)
-def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
+def create_user(user: schemas.UserCreate, token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+    current_user = auth.get_current_user(token, db)
+    if not current_user.is_admin:
+        raise HTTPException(status_code=403, detail="Not enough permissions")
+
     db_user = crud.get_user(db, username=user.username)
     if db_user:
         raise HTTPException(status_code=400, detail="Username already exists")
@@ -40,13 +45,21 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
 
 
 @router.get("/users/", response_model=List[schemas.User])
-def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+def read_users(skip: int = 0, limit: int = 100, token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+    current_user = auth.get_current_user(token, db)
+    if not current_user.is_admin:
+        raise HTTPException(status_code=403, detail="Not enough permissions")
+
     users = crud.get_users(db, skip=skip, limit=limit)
     return users
 
 
 @router.put("/users/{user_id}", response_model=schemas.User)
-def update_user(user_id: int, user: schemas.UserUpdate, db: Session = Depends(get_db)):
+def update_user(user_id: int, user: schemas.UserUpdate, token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+    current_user = auth.get_current_user(token, db)
+    if not current_user.is_admin:
+        raise HTTPException(status_code=403, detail="Not enough permissions")
+
     db_user = crud.update_user(db, user_id=user_id, user=user)
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
@@ -54,7 +67,11 @@ def update_user(user_id: int, user: schemas.UserUpdate, db: Session = Depends(ge
 
 
 @router.delete("/users/{user_id}", response_model=schemas.User)
-def delete_user(user_id: int, db: Session = Depends(get_db)):
+def delete_user(user_id: int, token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+    current_user = auth.get_current_user(token, db)
+    if not current_user.is_admin:
+        raise HTTPException(status_code=403, detail="Not enough permissions")
+
     db_user = crud.delete_user(db, user_id=user_id)
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
