@@ -2,8 +2,10 @@ from sqlalchemy.orm import Session
 from datetime import datetime
 from app import models, schemas
 
+
 def get_user(db: Session, username: str):
     return db.query(models.User).filter(models.User.username == username).first()
+
 
 def create_user(db: Session, user: schemas.UserCreate):
     db_user = models.User(username=user.username, password=user.password)
@@ -12,19 +14,25 @@ def create_user(db: Session, user: schemas.UserCreate):
     db.refresh(db_user)
     return db_user
 
+
 def get_task(db: Session, task_id: int):
     return db.query(models.Task).filter(models.Task.id == task_id).first()
 
+
 def get_tasks(db: Session, current_user_id, skip: int = 0, limit: int = 10):
-    db_tasks = db.query(models.Task).filter(models.Task.owner_id == current_user_id).offset(skip).limit(limit).all()
+    db_tasks = db.query(models.Task).filter(
+        models.Task.owner_id == current_user_id).offset(skip).limit(limit).all()
     return db_tasks
 
+
 def create_task(db: Session, task: schemas.TaskCreate, owner_id: int):
-    db_task = models.Task(title=task.title, description=task.description, priority=task.priority, due_date=task.due_date, owner_id=owner_id)
+    db_task = models.Task(title=task.title, description=task.description,
+                          priority=task.priority, due_date=task.due_date, owner_id=owner_id)
     db.add(db_task)
     db.commit()
     db.refresh(db_task)
     return db_task
+
 
 def update_task(db: Session, task_id: int, task: schemas.TaskUpdate):
     db_task = db.query(models.Task).filter(models.Task.id == task_id).first()
@@ -36,6 +44,7 @@ def update_task(db: Session, task_id: int, task: schemas.TaskUpdate):
     db.refresh(db_task)
     return db_task
 
+
 def delete_task(db: Session, task_id: int):
     db_task = db.query(models.Task).filter(models.Task.id == task_id).first()
     if not db_task:
@@ -44,14 +53,17 @@ def delete_task(db: Session, task_id: int):
     db.commit()
     return db_task
 
+
 def save_text_file_content(db: Session, content: str, owner_id: int):
     text_file = models.TextFile(content=content, owner_id=owner_id)
     db.add(text_file)
     db.commit()
     pass
 
+
 def save_audio_file(db: Session, content: bytes, filename: str, owner_id: int):
-    db_audio_file = models.AudioFile(content=content, filename=filename, owner_id=owner_id)
+    db_audio_file = models.AudioFile(
+        content=content, filename=filename, owner_id=owner_id)
     db.add(db_audio_file)
     db.commit()
     db.refresh(db_audio_file)

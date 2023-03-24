@@ -7,6 +7,7 @@ from app.auth import oauth2_scheme
 
 router = APIRouter()
 
+
 @router.post("/upload_text")
 async def upload_text_file(
     file: UploadFile = File(...),
@@ -15,7 +16,7 @@ async def upload_text_file(
 ):
     if file.content_type != "text/plain":
         raise HTTPException(status_code=400, detail="Invalid file type")
-    
+
     current_user = auth.get_current_user(token, db)
     content = await file.read()
     decoded_content = content.decode("utf-8")
@@ -24,6 +25,7 @@ async def upload_text_file(
     crud.save_text_file_content(db, decoded_content, owner_id=current_user.id)
 
     return {"filename": file.filename}
+
 
 @router.post("/upload_audio")
 async def upload_audio_file(
@@ -38,6 +40,7 @@ async def upload_audio_file(
     content = await file.read()
 
     # Save the content to the database
-    crud.save_audio_file(db, content=content, filename=filename, owner_id=current_user.id)
+    crud.save_audio_file(db, content=content,
+                         filename=filename, owner_id=current_user.id)
 
     return {"filename": file.filename}
