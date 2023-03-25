@@ -63,7 +63,7 @@ async def get_audio_file(audio_id: int, db: Session = Depends(get_db), token: st
     if audio_file is None:
         raise HTTPException(status_code=404, detail="Audio file not found")
 
-    if audio_file.owner_id != current_user.id:
+    if not current_user.is_admin and audio_file.owner_id != current_user.id:
         raise HTTPException(
             status_code=403, detail="Not authorized to access this audio file")
 
@@ -73,5 +73,9 @@ async def get_audio_file(audio_id: int, db: Session = Depends(get_db), token: st
 @router.get("/user_audios", response_model=List[schemas.AudioFile])
 async def get_user_audio_files(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
     current_user = auth.get_current_user(token, db)
-    audio_files = crud.get_audio_files_by_owner(db, owner_id=current_user.id)
+    if current_user.is_admin:
+        audio_files = crud.get_all_audio_files(db)
+    else:
+        audio_files = crud.get_audio_files_by_owner(
+            db, owner_id=current_user.id)
     return audio_files

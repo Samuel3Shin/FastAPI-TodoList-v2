@@ -105,3 +105,7 @@ def get_audio_file_by_id(db: Session, audio_id: int):
 
 def get_audio_files_by_owner(db: Session, owner_id: int):
     return db.query(models.AudioFile).filter(models.AudioFile.owner_id == owner_id).all()
+
+
+def get_all_audio_files(db: Session):
+    return db.query(models.AudioFile).all()
