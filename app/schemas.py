@@ -30,6 +30,7 @@ class UserBase(BaseModel):
     password: str
     company_name: str
     credits: int
+    is_active: bool
     is_admin: bool
 
     class Config:
