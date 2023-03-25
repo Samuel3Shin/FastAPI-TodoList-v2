@@ -45,11 +45,22 @@ async def upload_audio_file(
 
     # Save the content and agent_channel to the database
     audio_file = crud.save_audio_file(db, content=content, filename=filename,
-                         agent_channel=agent_channel, owner_id=current_user.id)
+                                      agent_channel=agent_channel, owner_id=current_user.id)
     if not audio_file:
         raise HTTPException(status_code=400, detail="Insufficient credits.")
 
     return {"filename": file.filename}
+
+
+@router.delete("/delete_audio/{audio_id}", response_model=schemas.AudioFile)
+def delete_audio_file(audio_id: int, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
+    current_user = auth.get_current_user(token, db)
+    audio_file = crud.delete_audio_file(db, audio_id)
+    if not current_user.is_admin and current_user.id != audio_file.owner_id:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    if audio_file is None:
+        raise HTTPException(status_code=404, detail="Audio file not found")
+    return audio_file
 
 
 @router.get("/audio/{audio_id}", response_model=bytes, responses={

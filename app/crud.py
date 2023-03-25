@@ -107,6 +107,16 @@ def save_audio_file(db: Session, content: bytes, filename: str, agent_channel: s
     return None
 
 
+def delete_audio_file(db: Session, audio_id: int):
+    audio_file = db.query(models.AudioFile).filter(
+        models.AudioFile.id == audio_id).first()
+    if not audio_file:
+        return None
+    db.delete(audio_file)
+    db.commit()
+    return audio_file
+
+
 def get_audio_file_by_id(db: Session, audio_id: int):
     return db.query(models.AudioFile).filter(models.AudioFile.id == audio_id).first()
 
