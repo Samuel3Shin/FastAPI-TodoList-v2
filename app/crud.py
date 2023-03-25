@@ -84,19 +84,27 @@ def delete_task(db: Session, task_id: int):
 
 
 def save_text_file_content(db: Session, content: str, owner_id: int):
-    text_file = models.TextFile(content=content, owner_id=owner_id)
-    db.add(text_file)
-    db.commit()
-    pass
+    user = db.query(models.User).filter(models.User.id == owner_id).first()
+    if user and user.credits > 0:
+        text_file = models.TextFile(content=content, owner_id=owner_id)
+        db.add(text_file)
+        user.credits -= 1
+        db.commit()
+        return True
+    return False
 
 
 def save_audio_file(db: Session, content: bytes, filename: str, agent_channel: str, owner_id: int):
-    audio_file = models.AudioFile(
-        content=content, filename=filename, agent_channel=agent_channel, owner_id=owner_id)
-    db.add(audio_file)
-    db.commit()
-    db.refresh(audio_file)
-    return audio_file
+    user = db.query(models.User).filter(models.User.id == owner_id).first()
+    if user and user.credits > 0:
+        audio_file = models.AudioFile(
+            content=content, filename=filename, agent_channel=agent_channel, owner_id=owner_id)
+        db.add(audio_file)
+        user.credits -= 1
+        db.commit()
+        db.refresh(audio_file)
+        return audio_file
+    return None
 
 
 def get_audio_file_by_id(db: Session, audio_id: int):
