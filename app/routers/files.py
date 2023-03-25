@@ -24,7 +24,8 @@ async def upload_text_file(
     decoded_content = content.decode("utf-8")
 
     # Save the content to the database
-    crud.save_text_file_content(db, decoded_content, owner_id=current_user.id)
+    if not crud.save_text_file_content(db, decoded_content, owner_id=current_user.id):
+        raise HTTPException(status_code=400, detail="Insufficient credits.")
 
     return {"filename": file.filename}
 
@@ -43,8 +44,10 @@ async def upload_audio_file(
     content = await file.read()
 
     # Save the content and agent_channel to the database
-    crud.save_audio_file(db, content=content, filename=filename,
+    audio_file = crud.save_audio_file(db, content=content, filename=filename,
                          agent_channel=agent_channel, owner_id=current_user.id)
+    if not audio_file:
+        raise HTTPException(status_code=400, detail="Insufficient credits.")
 
     return {"filename": file.filename}
 
