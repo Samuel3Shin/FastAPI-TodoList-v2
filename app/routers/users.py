@@ -44,6 +44,15 @@ def create_user(user: schemas.UserCreate, token: str = Depends(oauth2_scheme), d
     return crud.create_user(db=db, user=user)
 
 
+@router.get("/current_user", response_model=schemas.User)
+def read_users(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+    current_user = auth.get_current_user(token, db)
+    if not current_user:
+        raise HTTPException(status_code=400, detail="User not exists")
+
+    return current_user
+
+
 @router.get("/users/", response_model=List[schemas.User])
 def read_users(skip: int = 0, limit: int = 100, token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     current_user = auth.get_current_user(token, db)
